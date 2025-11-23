@@ -82,7 +82,7 @@ pip install -r requirements.txt
 OR 
 
 ```
-if installed with the pip ,it will instal dependencies also.
+if installed with the pip ,it will install dependencies also.
 ```
 
 ---
