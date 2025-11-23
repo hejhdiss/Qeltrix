@@ -6,6 +6,8 @@ Qeltrix is a Proof-of-Concept command-line utility for creating encrypted, conte
 
 > The qeltrix-pypi folder in this repository contains the PyPI package intended for upload. Due to technical issues, I’m currently unable to publish it to PyPI. The folder includes a detailed README.md with full documentation for pypi package.
 
+** For more explained README.md, please see qeltrix-pypi's README.md**
+
 ---
 
 ## Features
@@ -138,6 +140,9 @@ As a Proof-of-Concept, Qeltrix demonstrates several core ideas. Future versions 
 **Key Derivation Flexibility:** Introducing more modes for key derivation, such as combining multiple file sections or using external secret material.
 
 **Metadata Flexibility:** Enhancing the metadata block to support file system information, permissions, or custom user tags.
+
+**Asymmetric Key Transport:** Integrate an asymmetric encryption layer (e.g., RSA or ECC) to secure the **symmetric key** used for bulk data encryption. Since the core ChaCha20-Poly1305 is fast, the asymmetric overhead is applied only to the small symmetric key and metadata, not the large data blocks, enabling a **Public/Private Key Architecture** for secure key exchange.
+
 
 ---
 
