@@ -143,7 +143,7 @@ def pack_qeltrix(
                 "h": H.hex(),
                 "permute": bool(permute),
                 "mode_tag": hashlib.sha256(salt + b"qeltrix_mode:two_pass").hexdigest(),
-                "copyright": "HejHdiss (Muhammed Shafin P)"
+                "copyright": "@hejhdiss(Muhammed Shafin P)"
             }
             meta_bytes = json.dumps(meta, separators=(",", ":"), sort_keys=True).encode("utf-8")
 
