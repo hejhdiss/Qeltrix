@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qeltrix"
+version = "1.0.0"
+description = "Content-derived, parallel, streaming obfuscation container"
+authors = [{name = "Muhammed Shafin P", email = "hejhdiss@gmail.com"}]
+license = {text = "GPL-3.0"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "lz4>=4.0.0",
+    "cryptography>=41.0.0",
+]
+
+[project.scripts]
+qeltrix = "qeltrix:main"
+
+[project.urls]
+Homepage = "https://github.com/hejhdiss/Qeltrix"
+Repository = "https://github.com/hejhdiss/Qeltrix"

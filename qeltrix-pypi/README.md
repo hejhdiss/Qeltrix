@@ -2,9 +2,13 @@
 
 **Content-Derived, Parallel, Streaming Obfuscation Container (PoC)**
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Concept License: CC BY-SA 4.0](https://img.shields.io/badge/Concept%20License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+
 Qeltrix is a Proof-of-Concept command-line utility for creating encrypted, content-derived, and efficiently compressed data containers. It leverages parallel processing, modern cryptography (ChaCha20-Poly1305), and a streaming architecture suitable for large files.
 
-> The qeltrix-pypi folder in this repository contains the PyPI package intended for upload. Due to technical issues, I’m currently unable to publish it to PyPI. The folder includes a detailed README.md with full documentation for pypi package.
+> **Note:** This is a **CLI tool/script**, not an importable Python module. It is designed to be used directly from the command line for packing and unpacking files.
 
 ---
 
@@ -38,12 +42,35 @@ Qeltrix is written in Python 3 and requires several external dependencies.
 
 You must have Python 3.8+ installed.
 
+### Quick Install
+
+```bash
+# Clone the repository
+git clone https://github.com/hejhdiss/Qeltrix.git
+cd Qeltrix
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Make executable (Linux/macOS)
+chmod +x qeltrix.py
+
+# Optional: Install system-wide
+sudo cp qeltrix.py /usr/local/bin/qeltrix
+```
+
 ### Dependencies
 
 Install the required Python packages using pip:
 
 ```bash
 pip install lz4 cryptography
+```
+
+Or use the requirements file:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ---
@@ -129,21 +156,49 @@ The Qeltrix container (`.qltx`) structure is designed for stream processing and 
 
 ## Future Possibilities
 
-As a Proof-of-Concept, Qeltrix demonstrates several core ideas. Future versions and development could focus on:
+As a Proof-of-Concept, Qeltrix demonstrates several core ideas. There is **no guarantee of future updates or development** by the original author. This is a **for-the-community, by-the-community** project. The following are potential enhancements that anyone in the community can explore and implement:
 
 **Parallel Decoding:** Implementing multi-threaded or multi-process parallelization for the unpacking/decryption phase to significantly speed up data retrieval.
 
-**Alternative Compression:** Integration of other compression algorithms (e.g., Zstd, Brotli) for comparison and optimal container size/speed trade-offs.
+**Seekability:** Adding random-access capabilities to seek to specific blocks without processing the entire file, enabling faster partial extraction and streaming playback.
+
+**Alternative Compression:** Integration of other compression algorithms (e.g., Zstd, Brotli, LZMA) for comparison and optimal container size/speed trade-offs.
 
 **Key Derivation Flexibility:** Introducing more modes for key derivation, such as combining multiple file sections or using external secret material.
 
 **Metadata Flexibility:** Enhancing the metadata block to support file system information, permissions, or custom user tags.
 
+**Incremental Updates:** Supporting modification of individual blocks without reprocessing the entire file.
+
+**Deduplication:** Block-level deduplication to identify and eliminate redundant data.
+
+**Error Correction:** Adding Reed-Solomon or other error correction codes for resilience against storage corruption.
+
+**Multi-file Containers:** Extending the format to package multiple files with an internal directory structure.
+
+**Additional Enhancements:** Encryption algorithm variants, sparse file support, digital signatures, block size auto-tuning, streaming encryption for unknown-size data, and more.
+
+Feel free to fork, extend, and build upon this concept!
+
+---
+
+## Security Considerations
+
+As a PoC, Qeltrix demonstrates concepts but should **not be used for production security-critical applications** without thorough review and hardening. Some considerations:
+
+- Content-derived keys mean identical files produce identical containers (deterministic encryption)
+- The security depends entirely on content uniqueness and entropy
+- Susceptible to "confirmation of file attack" where someone with an identical file can confirm you also possess it (this is generally not a concern for most use cases, but matters in specific threat models)
+- No password recovery mechanism exists by design
+- The permutation layer provides obfuscation but not cryptographic strength
+
+For sensitive applications requiring plausible deniability, consider using traditional encryption with unique passwords or keys.
+
 ---
 
 ## Licensing
 
-This project uses dual licensing:
+This project uses dual licensing to ensure both the code and the underlying concept remain open and accessible:
 
 ### Code Implementation
 The Python implementation (`qeltrix.py`) and associated code are licensed under **GPLv3** (GNU General Public License version 3). You are free to use, modify, and distribute the code under the terms of the GPL.
@@ -155,6 +210,48 @@ The underlying concept, cryptographic approach, and file format design of Qeltri
 - If you remix, transform, or build upon the concept, you must distribute your contributions under the same CC BY-SA 4.0 license
 - You may use the concept for any purpose, including commercially
 
+**Full License Texts:**
+- [GPLv3 License](https://www.gnu.org/licenses/gpl-3.0.en.html)
+- [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/)
+
+---
+
+## Contributing
+
+This is an open, community-driven project. The original author has introduced the concept, and its evolution is now in the hands of the community. Contributions, forks, improvements, and derivative works are encouraged!
+
+Whether you want to:
+- Fix bugs or improve performance
+- Add new features (parallel decryption, seekability, alternative compression)
+- Create implementations in other languages
+- Write better documentation
+- Extend the concept in new directions
+
+Your contributions are welcome! Please feel free to:
+- Open issues for bugs or feature requests
+- Submit pull requests with improvements
+- Fork the project for your own experiments
+- Share your derivative works with the community
+
+Visit the repository at [github.com/hejhdiss/Qeltrix](https://github.com/hejhdiss/Qeltrix) to get started.
+
+---
+
+## Project Status
+
+**This is a Proof of Concept.** There is no guarantee of ongoing development or updates by the original author. The project is intentionally designed as a foundation for community exploration and extension. Whether Qeltrix evolves into something larger depends entirely on community interest and contributions.
+
+---
+
+## Author & Copyright
+
 **Qeltrix (.qltx) Concept & Implementation**  
 Copyright © 2025 HejHdiss (Muhammed Shafin P)  
-Code: GPLv3 | Concept: CC BY-SA 4.0 International
+
+Code Implementation: Licensed under GPLv3  
+Original Concept: Licensed under CC BY-SA 4.0 International
+
+**Contact:** [GitHub Profile](https://github.com/hejhdiss)  
+**Repository:** [github.com/hejhdiss/Qeltrix](https://github.com/hejhdiss/Qeltrix)
+
+
