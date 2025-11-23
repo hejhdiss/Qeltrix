@@ -58,6 +58,13 @@ chmod +x qeltrix.py
 # Optional: Install system-wide
 sudo cp qeltrix.py /usr/local/bin/qeltrix
 ```
+OR
+
+```bash 
+pip install qeltrix-pypi-package-name
+
+```
+
 
 ### Dependencies
 
@@ -71,6 +78,11 @@ Or use the requirements file:
 
 ```bash
 pip install -r requirements.txt
+```
+OR 
+
+```
+if installed with the pip ,it will instal dependencies also.
 ```
 
 ---
@@ -93,6 +105,12 @@ This is the recommended mode for maximum key entropy, as the key is derived from
 
 ```bash
 python3 qeltrix.py pack my_large_file.dat output.qltx
+```
+
+OR 
+
+```
+if installed using pip and  the python scripts folder is in system path, can use qeltrix-pypi-package-name [COMMANDS]
 ```
 
 #### Pack Options
