@@ -194,7 +194,7 @@ As a Proof-of-Concept, Qeltrix demonstrates several core ideas. There is **no gu
 
 **Multi-file Containers:** Extending the format to package multiple files with an internal directory structure.
 
-**Asymmetric Key Transport:** Integrate an asymmetric encryption layer (e.g., RSA or ECC) to secure the **symmetric key** used for bulk data encryption. Since the core ChaCha20-Poly1305 is fast, the asymmetric overhead is applied only to the small symmetric key and metadata, not the large data blocks, enabling a **Public/Private Key Architecture** for secure key exchange.
+**Asymmetric Key Transport:** Integrate an asymmetric encryption layer (e.g., RSA or ECC) to secure the **symmetric key** used for bulk data encryption. Since the core ChaCha20-Poly1305 is fast, the asymmetric overhead is applied only to the small symmetric key and metadata(includes footer also), not the large data blocks, enabling a **Public/Private Key Architecture** for secure key exchange.
 
 **Additional Enhancements:** Encryption algorithm variants, sparse file support, digital signatures, block size auto-tuning, streaming encryption for unknown-size data, and more.
 
