@@ -8,6 +8,24 @@ The `qeltrix-pypi` folder in this repository contains the PyPI package intended 
 
 For more detailed documentation, please see `qeltrix-pypi`'s README.md
 
+---
+
+## Community & Project Status
+
+This project is a personal **Proof-of-Concept (PoC)**, built by the community, for the community. As a PoC, it currently has significant limitations. Many complex and advanced **design plans were ultimately dropped** across all versions.
+
+Specific examples of dropped features include:
+* **V5 Advanced VFS:** Features like **parallel and serial mixing** of blocking and non-blocking file combinations within the Virtual File System (VFS), and other complex support structures, were planned but not implemented.
+* **Cross-Version Enhancements:** Certain multi-parallel and blocking VFS operations that would improve throughput were stopped or scaled back in various versions.
+
+These and many other planned features (including in V1, V2, V3, and V4) were abandoned due to the inherent **limitations of my knowledge** as the primary developer and the constraints of managing the project solo as a PoC.
+
+We believe Qeltrix's foundational architecture is robust, but it requires collaborative effort to achieve its full potential. We encourage the community to **take over** this project, help improve the codebase, address its current limitations, and implement the features necessary to build a better, more secure product.
+
+**Your contribution matters!** If you are unable to contribute code, we greatly value **feedback**, bug reports, and suggestions for improvement.
+
+---
+
 # Universal Dispatcher: qltx.py (Recommended Entry) 
 
 The primary entry point for all operations is the universal dispatcher script, `qltx.py`.
@@ -25,6 +43,116 @@ The `qltx.py` dispatcher now requires an explicit version flag (`-v`) for the `p
 | pack | `python qltx.py -v <version_num> pack <INFILE> <OUTFILE.qltx> [args...]` | Mandatory explicit version selection is required for packing (e.g., `-v 4` for V4). |
 | unpack | `python qltx.py unpack <qltx_file> <OUTFILE> [args...]` | Auto-detects version from the file header (V1-V4 supported). |
 | seek | `python qltx.py seek <qltx_file> offset length [args...]` | Auto-detects version from the file header (V1-V4 supported). |
+
+
+### For V5 (Folder Archiving) Usage
+
+**V5 is the first version to support folder archiving.** Its arguments are specific to the Virtual File System (VFS) model and differ from V1-V4 single-file operations.
+
+| Command | Usage | Description |
+|:---|:---|:---|
+| `pack` | `python qltx.py pack --input-folder <PATH> --output-file <ARCHIVE.q5> -v 5,[args...]` | **Mandatory explicit version** (`-v 5`). Archives an entire **folder** into a V5/V5A file. Use `--public-key` for V5A mode. |
+| `unpack` | `python qltx.py unpack --input-file <ARCHIVE.q5> --output-folder <PATH> [args...]` | Unpacks the V5/V5A archive to a designated **output folder**. |
+| `seek` | `python qltx.py seek --input-file <ARCHIVE.q5> --vfs-path <FILE_PATH> --offset <N> --length <L> [args...]` | **VFS Seek**: Reads a byte range from a specific file path **inside** the archive. Requires the `--vfs-path` argument. |
+
+> **Important Note on V5 Data Model:**
+> Versions **V1 through V4** are designed to operate on a **single input file**, where the entire file content is treated as one stream or a series of identical blocks. **V5** introduces a **Virtual File System (VFS)** model, allowing it to package an entire **folder** into a single container. Consequently, V5 uses distinct command-line arguments like `--input-folder` and `--vfs-path` that are not compatible with the older, single-file versions.
+
+## Qeltrix V5 (qeltrix-5.py) Enhancements
+
+The V5 format, implemented in the separate `qeltrix-5.py` script, transforms Qeltrix into a **Folder Archiver with VFS Seek** and introduces optional asymmetric encryption for metadata.
+
+### 1. New Core Features
+
+| Feature | Description | Benefit |
+|---------|-------------|---------|
+| **Folder Archiver** | V5 packages an entire directory, creating a Virtual File System (VFS) metadata block that maps relative paths, original sizes, and content hashes to data blocks. | Allows for archiving and retrieving multiple files within a single container. |
+| **Optional Asymmetric Metadata Encryption** | The encryption of the VFS metadata block is now optional, creating two modes: | Increases flexibility and security. |
+| **V5A Mode (Asymmetric)** | If `--public-key` is supplied during `pack`, the Metadata Encryption Key (MEK) is **RSA-encrypted** using the public key. This requires the corresponding `--private-key` for `unpack` or `seek`. | Enables secure, recipient-only sharing of archive contents. |
+| **V5 Mode (Unencrypted)** | If `--public-key` is **omitted** during `pack`, the VFS metadata is stored as **unencrypted JSON** alongside the data blocks. | Allows for rapid unpacking and seeking without requiring a private key (though the content blocks remain encrypted by the master key). |
+| **Backward Block Compatibility** | V5 is designed to pack and unpack individual file blocks using the **V2 (ChaCha20-Poly1305)** or **V4 (AES256-GCM)** format, specified via the `-v` config string (e.g., `-v 4,--compression=zstd`). | Leverages proven and tested block encryption methods while providing new VFS features. |
+| **Parallel Processing** | Utilizes Python's ProcessPoolExecutor for concurrent, CPU-intensive operations (encryption, decryption, compression).
+
+
+pack/unpack: Uses default workers (typically os.cpu_count()) for high throughput.
+
+seek: Uses max_workers=1 to run the single block decryption/decompression in a separate, isolated process.
+
+(Note: As a POC, it currently lacks an explicit --workers command-line argument, defaulting to the system's core count or 1 if os.cpu_count() is unavailable.Since this is a community project, contributions to add an explicit worker configuration are welcome!) | Dramatically improves performance for high-volume operations and isolates single-block operations like seek. |
+| **VFS Seek (Virtual File System Seek)** | Allows direct retrieval of a byte range (using --offset and --length) from a single file inside the archive, without needing to decrypt or decompress the entire archive or even the entire file block. | Enables instant access to small parts of large archived files (e.g., retrieving a config file header or log file segment) without full extraction, saving significant time and resources. |
+| **Format Version** | Internal format version bumped to **5**. | Clearly identifies files that support the V5 VFS and optional asymmetric metadata features. |
+
+### 2. Dependencies for V5
+
+V5 requires the same dependencies as previous versions:
+
+```bash
+pip install lz4 cryptography zstandard
+```
+##  Qeltrix V5 Command-Line Usage
+
+The Qeltrix V5.5(internal version) three main commands: `pack` (archiving), `unpack` (extraction), and `seek` (Virtual File System (VFS) seek).
+
+---
+
+### Global Options
+
+These options apply to all commands:
+
+| Option | Description | Default |
+|:---|:---|:---|
+| `cmd` | **Command**: Must be `pack`, `unpack`, or `seek`. | None (Required) |
+| `--key <KEY>` | **Master key** (password) for block content encryption/decryption. | `""` (empty string) |
+| `--private-key <PATH>` | **RSA Private Key** path. **REQUIRED** for `unpack` or `seek` of V5A (Asymmetrically Encrypted Metadata) archives. | `None` |
+| `--public-key <PATH>` | **RSA Public Key** path. If supplied during `pack`, the archive uses **V5A mode** (Asymmetric Metadata Encryption). | `None` |
+
+---
+
+### `pack` Command Arguments (Archiving)
+
+Creates a new V5/V5A archive from a folder.
+
+| Option | Description | Default |
+|:---|:---|:---|
+| `--input-folder <PATH>` | **Input folder** path to archive. | None (Required) |
+| `--output-file <PATH>` | **Output V5 archive** file path (e.g., `archive.q5`). | None (Required) |
+| `-v, --v-config <CONFIG>` | **V2/V4 Block Config**: Defines encryption, compression, and key derivation mode for data blocks. | `4,--compression=lz4,--permute,--mode=two_pass` |
+
+> ##### V-Config Format and Parameters
+>
+> The configuration string is: `VERSION,[--compression=<TYPE>|--permute|--mode=<TYPE>]`
+>
+> | Parameter | V-Config Syntax | Description |
+|:---|:---|:---|
+| **Version** | `2` or `4` | **2**: Uses ChaCha20-Poly1305. **4**: Uses AES-256-GCM. |
+| **Compression** | `--compression=<TYPE>` | Type: `lz4`, `zstd` (if available), or `none`. |
+| **Permutation** | `--permute` | Enables the content-seeded deterministic XOR byte permutation layer. |
+| **KDF Mode** | `--mode=<TYPE>` | **`two_pass`**: Hashes the entire file (More secure). **`single_pass_firstn`**: Hashes only the first 1024 bytes (Faster). |
+
+---
+
+### `unpack` Command Arguments (Extraction)
+
+Extracts the contents of a V5/V5A archive.
+
+| Option | Description | Default |
+|:---|:---|:---|
+| `--input-file <PATH>` | **Input V5 archive** file path. | None (Required) |
+| `--output-folder <PATH>` | **Output folder** path to extract files into. | None (Required) |
+
+---
+
+### `seek` Command Arguments (VFS Seeking)
+
+Retrieves a specific byte range from a single file inside the archive.
+
+| Option | Description | Default |
+|:---|:---|:---|
+| `--input-file <PATH>` | **Input V5 archive** file path. | None (Required) |
+| `--vfs-path <PATH>` | The **relative path** of the file inside the archive to seek into. | None (Required) |
+| `--offset <BYTES>` | **Start offset** in bytes within the VFS file to begin reading. | `0` |
+| `--length <BYTES>` | **Number of bytes** to read from the offset. | `1024` |
+| `--output <PATH>` | Optional file path to write the extracted seek data. (Prints hex preview if omitted). | `None` |
 
 ## Features (V1 Format - Implemented in qeltrix.py)
 
@@ -233,7 +361,13 @@ pip install lz4 cryptography zstandard
 ```
 
 
-#### Pack Options (All Versions)
+#### Pack Options (All Versions - except V5)
+***
+
+**Note on V5 (qeltrix-5.py):** The V5 Archiver introduces a fundamental shift to folder archiving with optional asymmetric metadata encryption.it also adds several unique, mandatory arguments and features. **Refer to the specific V5 Pack Options table.**
+
+***
+
 
 | Option | Version | Default | Description |
 |--------|---------|---------|-------------|
@@ -244,7 +378,7 @@ pip install lz4 cryptography zstandard
 | `--no-permute` | V1+ | | Disable the deterministic permutation layer. |
 | `--tempdir` | V1+ | (System default) | Specify a directory for temporary files (only used in `two_pass` mode). |
 | `--compression` | V2+ | lz4 | Specifies the per-block compression algorithm: `{lz4, zstd}`. |
-| `--algo` | V3+ | chacha20 | Specifies the bulk encryption algorithm: `{chacha20, aes256}`. |
+| `--algo` | V3+ | chacha20 | Specifies the bulk encryption algorithm: `{chacha20, aes256}`.Note: Not applicable in V4. |
 | `--recipient-pub-key` | V3 | | Enables V3-A mode. Path to the recipient's public key for DEK encryption. |
 | `--signer-priv-key` | V3 | | Path to the sender's private key to sign the metadata block. |
 
@@ -313,7 +447,8 @@ To run these tests, ensure all dependencies are installed and execute the script
 | `test.py` | `qeltrix.py` (V1) | Basic V1 functionality, including `two_pass` and `single_pass_firstN` key derivation modes. |
 | `test-2.py` | `qeltrix-2.py` (V2) | V2-specific features: Zstandard (Zstd) compression, parallel unpacking, and random access (seek). |
 | `test-3.py` | `qeltrix-3.py` (V3) | V3-specific features: Symmetric V3 pack/unpack, Asymmetric (V3-A) pack/unpack/seek, signing/verification, and AES-GCM encryption. |
-| `test-4.py` (NEW) | `qeltrix-4.py` (V4) | V4-specific features: AES256-GCM, parallel unpack, and seek. |
+| `test-4.py` | `qeltrix-4.py` (V4) | V4-specific features: AES256-GCM, parallel unpack, and seek. |
+| `test-5.py` (NEW) | `qeltrix-4.py` (V5) | 
 
 ## File Format Overview
 
@@ -351,7 +486,7 @@ Qeltrix is an open-source project driven by the community and for the community.
 
 ### Code Implementation
 
-The Python implementation (`qeltrix.py`, `qeltrix-2.py`, `qeltrix-3.py`,`qeltrix-4.py`and `qltx.py` dispatcher) and associated code are licensed under **GPLv3** (GNU General Public License version 3). You are free to use, modify, and distribute the code under the terms of the GPL.
+The Python implementation (`qeltrix.py`, `qeltrix-2.py`, `qeltrix-3.py`,`qeltrix-4.py`, `qeltrix-5.py` and `qltx.py` dispatcher) and associated code are licensed under **GPLv3** (GNU General Public License version 3). You are free to use, modify, and distribute the code under the terms of the GPL.
 
 ### Original Concept
 

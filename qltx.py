@@ -33,7 +33,9 @@ def detect_qeltrix_version(filepath: str) -> Optional[str]:
         version_num = struct.unpack('<I', header[4:])[0] 
         
         # Corrected the single '=' assignment operator to '==' comparison
-        if version_num == 4:
+        if version_num == 5:
+            return 'v5'
+        elif version_num == 4:
             return 'v4'
         elif version_num == 3:
             return 'v3' 
@@ -58,7 +60,9 @@ def get_script_and_version_for_pack(version_arg: str, args_to_pass: List[str]) -
     # The args_to_pass list is already clean (does not contain -v)
     try:
         # Determine routing based on the explicit version number
-        if version_arg == '4':
+        if version_arg == '5':
+            return 'qeltrix-5.py', 'v5', args_to_pass
+        elif version_arg == '4':
             return 'qeltrix-4.py', 'v4', args_to_pass
         elif version_arg == '3':
             return 'qeltrix-3.py', 'v3', args_to_pass
@@ -88,6 +92,8 @@ def get_script_and_version_for_decode(command: str, qltx_file: str) -> Tuple[str
         raise ValueError(f"Input file '{qltx_file}' is not a valid Qeltrix container or version is unsupported.")
 
     # --- ROUTING LOGIC ---
+    if version == 'v5':
+        return 'qeltrix-5.py', version
     if version == 'v3':
         return 'qeltrix-3.py', version
     if version == 'v4':
@@ -150,18 +156,32 @@ def main():
                 if len(args_to_pass) < 1:
                     raise ValueError(f"Command '{command}' requires an input file.")
                 
-                qltx_file = args_to_pass[0] 
-                # For decode, we ignore any version_arg and read the file header
-                script_file, version = get_script_and_version_for_decode(command, qltx_file)
-                full_args_for_subproc = [command] 
-                # For decode, all arguments after the command are passed
-                full_args_for_subproc.extend(args_to_pass) 
-            
-            else:
-                raise ValueError(f"Unknown Qeltrix command: {command}")
+                # --- NEW LOGIC: Find the qltx_file path for version detection ---
+                # The dispatcher must read the input file's header to determine the version (V1-V5)
+                # and route the command correctly. Newer backend scripts (V5) use the --input-file
+                # flag, so we must search for that flag and its value in the arguments list.
+                
+                qltx_file = None
+                try:
+                    # Try to find the file path passed using the standard flag for newer versions
+                    input_file_index = args_to_pass.index('--input-file')
+                    if input_file_index + 1 < len(args_to_pass):
+                        qltx_file = args_to_pass[input_file_index + 1]
+                    else:
+                        raise ValueError(f"Flag '--input-file' requires a file path argument.")
+                except ValueError:
+                    # Fallback for older versions that use positional argument
+                    # This handles: 'qltx.py unpack archive.qltx ...'
+                    qltx_file = args_to_pass[0]
+                
+                if not qltx_file:
+                    raise ValueError(f"Could not determine the input file path for '{command}' command.")
+                # --- END NEW LOGIC ---
 
         # --- Shared Dispatch Logic ---
+        script_file, version = get_script_and_version_for_decode(command, qltx_file)
         script_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), script_file)
+        full_args_for_subproc = [command] + args_to_pass
 
         if not os.path.exists(script_file_path):
             raise FileNotFoundError(f"Backend script '{script_file}' not found.")
