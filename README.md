@@ -51,9 +51,9 @@ The `qltx.py` dispatcher now requires an explicit version flag (`-v`) for the `p
 
 | Command | Usage | Description |
 |:---|:---|:---|
-| `pack` | `python qltx.py pack --input-folder <PATH> --output-file <ARCHIVE.q5> -v 5,[args...]` | **Mandatory explicit version** (`-v 5`). Archives an entire **folder** into a V5/V5A file. Use `--public-key` for V5A mode. |
-| `unpack` | `python qltx.py unpack --input-file <ARCHIVE.q5> --output-folder <PATH> [args...]` | Unpacks the V5/V5A archive to a designated **output folder**. |
-| `seek` | `python qltx.py seek --input-file <ARCHIVE.q5> --vfs-path <FILE_PATH> --offset <N> --length <L> [args...]` | **VFS Seek**: Reads a byte range from a specific file path **inside** the archive. Requires the `--vfs-path` argument. |
+| `pack` | `python qltx.py pack --input-folder <PATH> --output-file <ARCHIVE.qltx> -v 5,[args...]` | **Mandatory explicit version** (`-v 5`). Archives an entire **folder** into a V5/V5A file. Use `--public-key` for V5A mode. |
+| `unpack` | `python qltx.py unpack --input-file <ARCHIVE.qltx> --output-folder <PATH> [args...]` | Unpacks the V5/V5A archive to a designated **output folder**. |
+| `seek` | `python qltx.py seek --input-file <ARCHIVE.qltx> --vfs-path <FILE_PATH> --offset <N> --length <L> [args...]` | **VFS Seek**: Reads a byte range from a specific file path **inside** the archive. Requires the `--vfs-path` argument. |
 
 > **Important Note on V5 Data Model:**
 > Versions **V1 through V4** are designed to operate on a **single input file**, where the entire file content is treated as one stream or a series of identical blocks. **V5** introduces a **Virtual File System (VFS)** model, allowing it to package an entire **folder** into a single container. Consequently, V5 uses distinct command-line arguments like `--input-folder` and `--vfs-path` that are not compatible with the older, single-file versions.
@@ -71,14 +71,7 @@ The V5 format, implemented in the separate `qeltrix-5.py` script, transforms Qel
 | **V5A Mode (Asymmetric)** | If `--public-key` is supplied during `pack`, the Metadata Encryption Key (MEK) is **RSA-encrypted** using the public key. This requires the corresponding `--private-key` for `unpack` or `seek`. | Enables secure, recipient-only sharing of archive contents. |
 | **V5 Mode (Unencrypted)** | If `--public-key` is **omitted** during `pack`, the VFS metadata is stored as **unencrypted JSON** alongside the data blocks. | Allows for rapid unpacking and seeking without requiring a private key (though the content blocks remain encrypted by the master key). |
 | **Backward Block Compatibility** | V5 is designed to pack and unpack individual file blocks using the **V2 (ChaCha20-Poly1305)** or **V4 (AES256-GCM)** format, specified via the `-v` config string (e.g., `-v 4,--compression=zstd`). | Leverages proven and tested block encryption methods while providing new VFS features. |
-| **Parallel Processing** | Utilizes Python's ProcessPoolExecutor for concurrent, CPU-intensive operations (encryption, decryption, compression).
-
-
-pack/unpack: Uses default workers (typically os.cpu_count()) for high throughput.
-
-seek: Uses max_workers=1 to run the single block decryption/decompression in a separate, isolated process.
-
-(Note: As a POC, it currently lacks an explicit --workers command-line argument, defaulting to the system's core count or 1 if os.cpu_count() is unavailable.Since this is a community project, contributions to add an explicit worker configuration are welcome!) | Dramatically improves performance for high-volume operations and isolates single-block operations like seek. |
+| **Parallel Processing** | Utilizes Python's ProcessPoolExecutor for concurrent, CPU-intensive operations (encryption, decryption, compression). pack/unpack: Uses default workers (typically os.cpu_count()) for high throughput. seek: Uses max_workers=1 to run the single block decryption/decompression in a separate, isolated process.(Note: As a POC, it currently lacks an explicit --workers command-line argument, defaulting to the system's core count or 1 if os.cpu_count() is unavailable.Since this is a community project, contributions to add an explicit worker configuration are welcome!) | Dramatically improves performance for high-volume operations and isolates single-block operations like seek. |
 | **VFS Seek (Virtual File System Seek)** | Allows direct retrieval of a byte range (using --offset and --length) from a single file inside the archive, without needing to decrypt or decompress the entire archive or even the entire file block. | Enables instant access to small parts of large archived files (e.g., retrieving a config file header or log file segment) without full extraction, saving significant time and resources. |
 | **Format Version** | Internal format version bumped to **5**. | Clearly identifies files that support the V5 VFS and optional asymmetric metadata features. |
 
