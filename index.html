@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qeltrix Project Hub</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles and Inter font application */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* GitHub Dark Mode Background */
+            color: #c9d1d9; /* GitHub Text Color */
+        }
+        .gradient-text {
+            /* Text gradient for the logo/title */
+            background-image: linear-gradient(to right, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card {
+            background-color: #161b22; /* Slightly lighter than body for cards */
+            border: 1px solid #30363d;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-4xl space-y-8">
+
+        <!-- Header and Introduction Section -->
+        <header class="text-center">
+            <h1 class="text-6xl font-extrabold gradient-text tracking-tight mb-4">
+                Qeltrix Project Hub
+            </h1>
+            <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                Welcome to the central landing page for the Qeltrix family of Proof-of-Concept projects.
+                This is where the community comes together to collaborate, discuss, and contribute.
+            </p>
+        </header>
+
+        <!-- Contribution Call-to-Action -->
+        <div class="bg-blue-900/30 p-4 rounded-lg text-center border border-blue-600/50">
+            <h2 class="text-2xl font-semibold text-blue-300 mb-2">Support Qeltrix</h2>
+            <p class="text-gray-200">
+                Show your support and help the project grow!
+            </p>
+            <div class="mt-4 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <a href="https://github.com/Qeltrix/Qeltrix" target="_blank" class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                    Star the Organization Repo
+                </a>
+                <a href="https://github.com/Qeltrix/Qeltrix/fork" target="_blank" class="px-6 py-3 bg-gray-600 text-white font-bold rounded-lg shadow-md hover:bg-gray-700 transition-colors">
+                    Fork the Codebase
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Links Grid -->
+        <div class="grid md:grid-cols-2 gap-6">
+
+            <!-- Official Organization Repository Card -->
+            <a href="https://github.com/Qeltrix/Qeltrix" target="_blank" class="block card rounded-xl p-6 hover:ring-2 hover:ring-blue-500">
+                <div class="flex items-center space-x-4">
+                    <svg class="w-8 h-8 text-blue-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM6 9a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm-1 3a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-200">Organization Repository</h2>
+                        <p class="text-sm text-gray-400">Qeltrix/Qeltrix (New Home)</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-gray-300">
+                    The primary, community-driven repository. **Open issues and discussions here!**
+                </p>
+            </a>
+
+            <!-- Personal Repository Card -->
+            <a href="https://github.com/hejhdiss/Qeltrix" target="_blank" class="block card rounded-xl p-6 hover:ring-2 hover:ring-purple-500">
+                <div class="flex items-center space-x-4">
+                    <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17.5a16.03 16.03 0 01-3.9 0v-2.75a7.99 7.99 0 00-2.84 0 16.03 16.03 0 01-3.9 0v2.75h10.64zM10 10a1 1 0 011 1v4a1 1 0 11-2 0v-4a1 1 0 011-1z"></path></svg>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-200">Original PoC Repository</h2>
+                        <p class="text-sm text-gray-400">hejhdiss/Qeltrix</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-gray-300">
+                    The initial Proof-of-Concept (PoC) codebase and historical versions (V1-V5).
+                </p>
+            </a>
+            
+            <!-- PyPI Documentation Link Card -->
+            <a href="https://pypi.org/project/qeltrix/" target="_blank" class="block card rounded-xl p-6 md:col-span-2 hover:ring-2 hover:ring-green-500">
+                <div class="flex items-center space-x-4">
+                    <svg class="w-8 h-8 text-green-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-200">PyPI Package & Readme</h2>
+                        <p class="text-sm text-gray-400">pypi.org/project/qeltrix/</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-gray-300">
+                    Find the published package and review the detailed `README.md` documentation.
+                </p>
+            </a>
+
+        </div>
+
+        <!-- Licensing Section -->
+        <section class="mt-8 pt-6 border-t border-gray-700/50">
+            <h2 class="text-3xl font-bold text-gray-100 mb-4 text-center">Licensing & Concept Rights</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 text-center md:text-left">
+                
+                <!-- Code License Card -->
+                <div class="card rounded-xl p-6 border-green-500/50">
+                    <h3 class="text-xl font-semibold text-green-400 mb-2">Code Implementation License</h3>
+                    <p class="text-gray-300">
+                        The Python implementation (`qltx.py`, etc.) is licensed under:
+                    </p>
+                    <p class="mt-2 text-2xl font-extrabold text-green-500">
+                        <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank" class="hover:underline">GPLv3 (GNU General Public License version 3)</a>
+                    </p>
+                    <p class="text-sm text-gray-400 mt-2">
+                        You are free to use, modify, and distribute the code under the terms of the GPL.
+                    </p>
+                </div>
+                
+                <!-- Concept License Card -->
+                <div class="card rounded-xl p-6 border-yellow-500/50">
+                    <h3 class="text-xl font-semibold text-yellow-400 mb-2">Original Concept & Design License</h3>
+                    <p class="text-gray-300">
+                        The underlying concept, cryptographic approach, and file format design are licensed under:
+                    </p>
+                    <p class="mt-2 text-2xl font-extrabold text-yellow-500">
+                        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" class="hover:underline">CC BY-SA 4.0 (Creative Commons Attribution-ShareAlike 4.0 International)</a>
+                    </p>
+                    <p class="text-sm text-gray-400 mt-2">
+                        You must give credit, and if you build upon the concept, you must distribute your contribution under the same license.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Footer -->
+        <footer class="text-center pt-8 border-t border-gray-700/50 mt-10">
+            <h3 class="text-3xl font-bold text-gray-100 mb-2">Join the Discussion!</h3>
+            <p class="text-gray-400 max-w-3xl mx-auto">
+                If you encounter issues, have questions about the architecture, or want to propose new features, please use the new **Organization Repository** links.
+            </p>
+            <p class="mt-4 text-sm text-gray-500">
+                <a href="https://github.com/Qeltrix/Qeltrix/issues" target="_blank" class="text-blue-500 hover:text-blue-400 transition-colors">Open an Issue</a> &bull;
+                <a href="https://github.com/Qeltrix/Qeltrix/discussions" target="_blank" class="text-blue-500 hover:text-blue-400 transition-colors">Start a Discussion</a>
+            </p>
+            <!-- Copyright Notice Added -->
+            <p class="mt-6 text-xs text-gray-600">
+                Copyright &copy; 2025 HejHdiss. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+</body>
+</html>
